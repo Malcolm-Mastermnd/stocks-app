@@ -7,7 +7,7 @@ interface AdvancedInfoCardsProps {
   weekPercentChange: number;
   monthPercentChange: number;
   yearPercentChange: number;
-  dividendYield?: number;
+  assetsToLiabilities?: number;
   earningsPerShare: number;
   marketCap: number;
 }
@@ -16,7 +16,7 @@ function AdvancedInfoCards({
   weekPercentChange,
   monthPercentChange,
   yearPercentChange,
-  dividendYield,
+  assetsToLiabilities,
   earningsPerShare,
   marketCap,
 }: AdvancedInfoCardsProps) {
@@ -26,15 +26,15 @@ function AdvancedInfoCards({
       {/* Percentages Card */}
       <Card sx={{ width: '100%', mb: 2, p: 2 }} elevation={5}>
         <FlexXBox justifyContent='space-between'>
-          <Typography variant='h6'>Last Week</Typography>
+          <Typography variant='h6'>In the Last Week</Typography>
           <PercentaceChange percentage={weekPercentChange} />
         </FlexXBox>
         <FlexXBox justifyContent='space-between'>
-          <Typography variant='h6'>Last Month</Typography>
+          <Typography variant='h6'>In the Last Month</Typography>
           <PercentaceChange percentage={monthPercentChange} />
         </FlexXBox>
         <FlexXBox justifyContent='space-between'>
-          <Typography variant='h6'>Last Year</Typography>
+          <Typography variant='h6'>In the Last Year</Typography>
           <PercentaceChange percentage={yearPercentChange} />
         </FlexXBox>
       </Card>
@@ -42,8 +42,8 @@ function AdvancedInfoCards({
       {/* Extra Info Card */}
       <Card sx={{ width: '100%', mb: 2, p: 2 }} elevation={5}>
         <FlexXBox justifyContent='space-between'>
-          <Typography variant='h6'>Dividend Yield</Typography>
-          <Typography variant='h6'>{dividendYield ? `${dividendYield}%` : 'N/A'}</Typography>
+          <Typography variant='h6'>Assets to Liabilities Ratio</Typography>
+          <Typography variant='h6'>{assetsToLiabilities}</Typography>
         </FlexXBox>
         <FlexXBox justifyContent='space-between'>
           <Typography variant='h6'>Earnings Per Share</Typography>

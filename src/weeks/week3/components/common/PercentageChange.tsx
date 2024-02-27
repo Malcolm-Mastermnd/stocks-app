@@ -1,6 +1,7 @@
 import { Typography } from "@mui/material";
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import FlexXBox from "../common/FlexXBox";
+import { formatPercentage } from "../../utils/utils";
 
 interface PercentaceChangeProps {
 	percentage: number;
@@ -11,7 +12,9 @@ function PercentaceChange({
 }: PercentaceChangeProps) {
 	return (
     <FlexXBox sx={{ alignItems: 'center', gap: 1 }}>
-      <Typography variant='h5'>{`${percentage > 0 ? '+' : ''} ${percentage}%`}</Typography>
+      <Typography variant='h5'>
+        {`${percentage > 0 ? '+' : ''} ${formatPercentage(percentage)}`}
+      </Typography>
       <ShowChartIcon
         sx={{
           color: percentage > 0 ? 'green' : 'red',

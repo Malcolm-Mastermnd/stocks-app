@@ -1,4 +1,5 @@
-export function formatLargeMoney(number: number): string {
+export function formatMoney(number?: number | null): string {
+  if (!number) return 'N/A';
   if (number >= 1e12) {
     return `$${(number / 1e12).toFixed(2)}T`;
   } else if (number >= 1e9) {
@@ -10,4 +11,18 @@ export function formatLargeMoney(number: number): string {
   } else {
     return `$${number.toFixed(2)}`;
   }
+}
+
+export function formatPercentage(number?: number | null): string {
+  if (!number) return 'N/A';
+  return `${number.toFixed(2)}%`;
+}
+
+export function calculatePercentChange(
+  previous?: number | null,
+  current?: number | null,
+): number {
+  if (!previous || !current) return NaN;
+  const change = current - previous;
+  return (change / previous) * 100;
 }

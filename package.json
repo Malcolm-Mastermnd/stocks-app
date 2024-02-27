@@ -17,6 +17,8 @@
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.15.10",
     "@mui/material": "^5.15.7",
+    "axios": "^1.6.7",
+    "axios-hooks": "^5.0.2",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.3",
     "react": "^18.2.0",

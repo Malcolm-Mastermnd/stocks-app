@@ -82,7 +82,7 @@ function App() {
               weekPercentChange={4.89}
               monthPercentChange={21.50}
               yearPercentChange={-14.35}
-              dividendYield={0.53}
+              assetsToLiabilities={0.53}
               earningsPerShare={1.46}
               marketCap={2820000000000}
             />
