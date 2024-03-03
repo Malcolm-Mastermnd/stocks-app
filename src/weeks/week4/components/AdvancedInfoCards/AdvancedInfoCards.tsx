@@ -4,6 +4,10 @@ import PercentaceChange from '../common/PercentageChange';
 import { calculatePercentChange as calcPercentChange, formatMoney } from '../../utils/utils';
 import useAxios from 'axios-hooks';
 import { AggregatesResponse, StockFinancialsResponse, TickerDetailsResponse } from '../../types/polygon.types';
+import { Currency } from '../../types/types';
+import { useEffect } from 'react';
+
+const FIVE_MINUTES = 5 * 60 * 1000;
 
 const date = new Date();
 const EST_OFFSET = 5; // EST is UTC-5
@@ -13,16 +17,21 @@ const LAST_YEAR_EST = new Date(date.setFullYear(date.getFullYear() - 1)).toISOSt
 
 interface AdvancedInfoCardsProps {
   stockSymbol: string;
+	currency: Currency;
 }
 
 function AdvancedInfoCards({
   stockSymbol,
+  currency,
 }: AdvancedInfoCardsProps) {
-  const [{
+  const [
+    {
     data: weekBarData,
-    loading: isWeekBarLoading,
-    error: weekBarError,
-  }] = useAxios<AggregatesResponse>({
+      loading: isWeekBarLoading,
+      error: weekBarError,
+    },
+    refetchWeekBarData,
+  ] = useAxios<AggregatesResponse>({
   url: `${import.meta.env.VITE_POLYGON_API_BASE_URL}/v2/aggs/ticker/${stockSymbol}/range/1/week/${LAST_YEAR_EST}/${TODAY_EST}`,
   params: {
     apiKey: import.meta.env.VITE_POLYGON_API_KEY,
@@ -31,11 +40,14 @@ function AdvancedInfoCards({
   }
   });
 
-  const [{
-    data: monthBarData,
-    loading: isMonthBarLoading,
-    error: monthBarError,
-  }] = useAxios<AggregatesResponse>({
+  const [
+    {
+      data: monthBarData,
+      loading: isMonthBarLoading,
+      error: monthBarError,
+    },
+    refetchMonthBarData,
+  ] = useAxios<AggregatesResponse>({
   url: `${import.meta.env.VITE_POLYGON_API_BASE_URL}/v2/aggs/ticker/${stockSymbol}/range/1/month/${LAST_YEAR_EST}/${TODAY_EST}`,
   params: {
     apiKey: import.meta.env.VITE_POLYGON_API_KEY,
@@ -44,11 +56,14 @@ function AdvancedInfoCards({
   }
   });
 
-  const [{
-    data: yearBarData,
-    loading: isYearBarLoading,
-    error: yearBarError,
-  }] = useAxios<AggregatesResponse>({
+  const [
+    {
+      data: yearBarData,
+      loading: isYearBarLoading,
+      error: yearBarError,
+    },
+    refetchYearBarData,
+  ] = useAxios<AggregatesResponse>({
   url: `${import.meta.env.VITE_POLYGON_API_BASE_URL}/v2/aggs/ticker/${stockSymbol}/range/1/year/${LAST_YEAR_EST}/${TODAY_EST}`,
   params: {
     apiKey: import.meta.env.VITE_POLYGON_API_KEY,
@@ -57,28 +72,46 @@ function AdvancedInfoCards({
   }
   });
 
-  const [{
-    data: tickerDetailsData,
-    loading: isTickerDetailsLoading,
-    error: tickerDetailsError,
-  }] = useAxios<TickerDetailsResponse>({
+  const [
+    {
+      data: tickerDetailsData,
+      loading: isTickerDetailsLoading,
+      error: tickerDetailsError,
+    },
+    refetchTickerDetailsData,
+  ] = useAxios<TickerDetailsResponse>({
     url: `${import.meta.env.VITE_POLYGON_API_BASE_URL}/v3/reference/tickers/${stockSymbol}`,
     params: {
       apiKey: import.meta.env.VITE_POLYGON_API_KEY,
     }
   });
 
-  const [{
-    data: stockFinancialsData,
-    loading: isStockFinancialsLoading,
-    error: stockFinancialsError,
-  }] = useAxios<StockFinancialsResponse>({
+  const [
+    {
+      data: stockFinancialsData,
+      loading: isStockFinancialsLoading,
+      error: stockFinancialsError,
+    },
+    refetchStockFinancialsData,
+  ] = useAxios<StockFinancialsResponse>({
     url: `${import.meta.env.VITE_POLYGON_API_BASE_URL}/vX/reference/financials`,
     params: {
       apiKey: import.meta.env.VITE_POLYGON_API_KEY,
       ticker: stockSymbol,
     }
   });
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      console.log('Refetching data')
+      refetchWeekBarData();
+      refetchMonthBarData();
+      refetchYearBarData();
+      refetchTickerDetailsData();
+      refetchStockFinancialsData();
+    }, FIVE_MINUTES);
+    return () => clearInterval(intervalId);
+  }, [])
 
   const isLoading = isWeekBarLoading || isMonthBarLoading || isYearBarLoading || isTickerDetailsLoading || isStockFinancialsLoading;
   const isError = !!weekBarError || !!monthBarError || !!yearBarError || !!tickerDetailsError || !!stockFinancialsError;
@@ -126,11 +159,11 @@ function AdvancedInfoCards({
         </FlexXBox>
         <FlexXBox justifyContent='space-between'>
           <Typography variant='h6'>Earnings Per Share</Typography>
-          <Typography variant='h6'>{`${formatMoney(eps)}`}</Typography>
+          <Typography variant='h6'>{`${formatMoney(eps, currency)}`}</Typography>
         </FlexXBox>
         <FlexXBox justifyContent='space-between'>
           <Typography variant='h6'>Market Cap</Typography>
-          <Typography variant='h6'>{formatMoney(marketCap)}</Typography>
+          <Typography variant='h6'>{formatMoney(marketCap, currency)}</Typography>
         </FlexXBox>
       </Card>
 

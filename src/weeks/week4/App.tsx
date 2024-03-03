@@ -1,11 +1,9 @@
 import WeekSelect from '../../components/WeekSelect/WeekSelect';
-import SideNav from './components/SideNav/SideNav';
-import SearchBox from './components/SearchBox/SearchBox';
+import SideNav, { SIDE_NAV_WIDTH } from './components/SideNav/SideNav';
 import theme from './theme/theme';
 import { Box, ThemeProvider } from '@mui/material';
-import StockInformation from './components/StockInformation/StockInformation';
-import FlexYBox from './components/common/FlexYBox';
 import FlexXBox from './components/common/FlexXBox';
+import { Outlet } from 'react-router-dom';
 
 function App() {
   return (
@@ -13,13 +11,10 @@ function App() {
       <Box>
         <WeekSelect />
         <FlexXBox width='100vw'>
-          <SideNav order={3} excited={true} />
-          <FlexYBox padding='3% 15%'>
-            <SearchBox order={4} excited={false} />
-            <StockInformation stockSymbol='AAPL' companyName='Apple Inc.' isOnWatchList />
-            <StockInformation stockSymbol='TSLA' companyName='Tesla Inc.' isOnWatchList isFavorite />
-            <StockInformation stockSymbol='LULU' companyName='Lululemon Athletica Inc.' />
-          </FlexYBox>
+          <SideNav />
+          <Box marginLeft={SIDE_NAV_WIDTH} padding='3% 15%'>
+            <Outlet />
+          </Box>
         </FlexXBox>
       </Box>
     </ThemeProvider>

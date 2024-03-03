@@ -11,6 +11,9 @@ import Week7 from './weeks/week7/App.tsx';
 import Week8 from './weeks/week8/App.tsx';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import './index.css';
+import SearchPage from './weeks/week4/pages/SearchPage/SearchPage.tsx';
+import FavoritePage from './weeks/week4/pages/FavoritePage/FavoritePage.tsx';
+import WatchListPage from './weeks/week4/pages/WatchListPage/WatchListPage.tsx';
 
 const router = createBrowserRouter(
   [
@@ -37,6 +40,24 @@ const router = createBrowserRouter(
     {
       path: "/week4",
       element:  <Week4 />,
+      children: [
+        {
+          index: true,
+          element: <SearchPage />,
+        },
+        {
+          path: 'search',
+          element: <SearchPage />
+        },
+        {
+          path: 'watchlist',
+          element: <WatchListPage />
+        },
+        {
+          path: 'favorite',
+          element: <FavoritePage />
+        },
+      ],
     },
     {
       path: "/week5",

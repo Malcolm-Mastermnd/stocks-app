@@ -1,4 +1,4 @@
-import { Box, Card, CircularProgress, Divider, Typography } from "@mui/material";
+import { Box, Card, CircularProgress, Divider, IconButton, Typography } from "@mui/material";
 import EyeIcon from '@mui/icons-material/Visibility';
 import EyeOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import StarIcon from '@mui/icons-material/Star';
@@ -7,22 +7,36 @@ import FlexYBox from "../common/FlexYBox";
 import PercentaceChange from "../common/PercentageChange";
 import useAxios from "axios-hooks";
 import { NewsResponse, TickerSnapshotResponse } from "../../types/polygon.types";
-import { calculatePercentChange } from "../../utils/utils";
+import { calculatePercentChange, formatMoney } from "../../utils/utils";
 import FlexXBox from "../common/FlexXBox";
+import { useState } from "react";
+import { Currency } from "../../types/types";
 
 interface BasicInfoCardProps {
 	stockSymbol: string;
 	companyName: string;
 	isOnWatchList?: boolean;
 	isFavorite?: boolean;
+	currency: Currency;
 }
 
 function BasicInfoCard({
 	stockSymbol,
 	companyName,
-	isOnWatchList,
-	isFavorite,
+	isOnWatchList: initialIsOnWatchList = false,
+	isFavorite: initialIsFavorite = false,
+	currency,
 }: BasicInfoCardProps) {
+	const [isOnWatchList, setIsOnWatchList] = useState<boolean>(initialIsOnWatchList);
+	const [isFavorite, setIsFavorite] = useState<boolean>(initialIsFavorite);
+
+	const handleWatchListClick = () => {
+		setIsOnWatchList((prev) => !prev);
+	}
+	const handleFavoriteClick = () => {
+		setIsFavorite((prev) => !prev);
+	}
+
   const [{
       data: snapshotData,
       loading: isSnapshotLoading,
@@ -51,7 +65,7 @@ function BasicInfoCard({
 	const isError = !!snapshotError || !!newsError;
 
 	return (
-		<Card sx={{ width: '100%', mb: 2 }} elevation={5}>
+		<Card sx={{ width: '100%' }} elevation={5}>
 			<FlexYBox alignItems='center' p={2}>
 				{/* Header */}
 				<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
@@ -61,8 +75,12 @@ function BasicInfoCard({
 						<Typography variant='h4'>{companyName}</Typography>
 					</Box>
 					<Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
-						{isOnWatchList ? <EyeIcon fontSize='large' /> : <EyeOutlinedIcon fontSize='large' />}
-						{isFavorite ? <StarIcon fontSize='large' /> : <StarBorderIcon fontSize='large' />}
+						<IconButton onClick={handleWatchListClick}>
+							{isOnWatchList ? <EyeIcon fontSize='large' /> : <EyeOutlinedIcon fontSize='large' />}
+						</IconButton>
+						<IconButton onClick={handleFavoriteClick}>
+							{isFavorite ? <StarIcon fontSize='large' /> : <StarBorderIcon fontSize='large' />}
+						</IconButton>
 					</Box>
 				</Box>
 
@@ -81,8 +99,11 @@ function BasicInfoCard({
 						
 							{/* Prices */}
 							<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-								<Typography variant='h5'>{`$${snapshotData.ticker?.day?.c}`}</Typography>
-								<Typography variant='subtitle1'>{`High $${snapshotData.ticker?.day?.h} Low: $${snapshotData.ticker?.day?.l}`}</Typography>
+								<Typography variant='h5'>{formatMoney(snapshotData.ticker?.day?.c, currency)}</Typography>
+								<Typography variant='subtitle1'>
+									{`High ${formatMoney(snapshotData.ticker?.day?.h, currency)}
+										Low: $${formatMoney(snapshotData.ticker?.day?.l, currency)}`}
+								</Typography>
 							</Box>
 							
 							{/* News */}

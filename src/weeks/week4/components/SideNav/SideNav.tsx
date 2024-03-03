@@ -1,40 +1,29 @@
-import React from 'react';
+import { Typography } from '@mui/material';
+import FlexYBox from '../common/FlexYBox';
+import SideNavLink from './SideNavLink/SideNavLink';
 
-type SideNavStyles = {
-  root: React.CSSProperties,
-}
+export const SIDE_NAV_WIDTH = '300px';
 
-const divWithBorder: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  width: '300px',
-  justifyContent: 'center',
-  alignItems: 'center',
-  border: '3px solid green',
-}
-
-const styles: SideNavStyles = {
-  root: {
-    ...divWithBorder,
-    height: '100vh',
-  },
-}
-
-interface SideNavProps {
-  order: number;
-  excited: boolean;
-}
-
-function SideNav({
-  order,
-  excited,
-}: SideNavProps) {
+function SideNav() {
   return (
-    <div style={styles.root}>
-      <div>Side Nav</div>
-      <div>{`Order that this will be worked on: ${order}`}</div>
-      <div>{`I am${excited ? '' : ' not'} excited to work on this part`}</div>
-    </div>
+    <FlexYBox
+      height='100vh'
+      position='fixed'
+      width={SIDE_NAV_WIDTH}
+      boxSizing='border-box'
+      p={2}
+      bgcolor='#121212'
+      left={0}
+      top={0}
+    >
+      <Typography variant='h2'>STONKLY</Typography>
+
+      <FlexYBox gap={2} mt={4}>
+        <SideNavLink link='/week4/search' text='Search' />
+        <SideNavLink link='/week4/watchlist' text='Watchlist' />
+        <SideNavLink link='/week4/favorite' text='Favorite' />
+      </FlexYBox>
+    </FlexYBox>
   );
 }
 
