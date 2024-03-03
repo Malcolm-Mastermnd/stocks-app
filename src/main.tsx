@@ -11,9 +11,12 @@ import Week7 from './weeks/week7/App.tsx';
 import Week8 from './weeks/week8/App.tsx';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import './index.css';
-import SearchPage from './weeks/week4/pages/SearchPage/SearchPage.tsx';
-import FavoritePage from './weeks/week4/pages/FavoritePage/FavoritePage.tsx';
-import WatchListPage from './weeks/week4/pages/WatchListPage/WatchListPage.tsx';
+import SearchPageWeek4 from './weeks/week4/pages/SearchPage/SearchPage.tsx';
+import FavoritePageWeek4 from './weeks/week4/pages/FavoritePage/FavoritePage.tsx';
+import WatchListPageWeek4 from './weeks/week4/pages/WatchListPage/WatchListPage.tsx';
+import SearchPageWeek5 from './weeks/week5/pages/SearchPage/SearchPage.tsx';
+import FavoritePageWeek5 from './weeks/week5/pages/FavoritePage/FavoritePage.tsx';
+import WatchListPageWeek5 from './weeks/week5/pages/WatchListPage/WatchListPage.tsx';
 
 const router = createBrowserRouter(
   [
@@ -43,25 +46,43 @@ const router = createBrowserRouter(
       children: [
         {
           index: true,
-          element: <SearchPage />,
+          element: <SearchPageWeek4 />,
         },
         {
           path: 'search',
-          element: <SearchPage />
+          element: <SearchPageWeek4 />
         },
         {
           path: 'watchlist',
-          element: <WatchListPage />
+          element: <WatchListPageWeek4 />
         },
         {
           path: 'favorite',
-          element: <FavoritePage />
+          element: <FavoritePageWeek4 />
         },
       ],
     },
     {
       path: "/week5",
       element:  <Week5 />,
+      children: [
+        {
+          index: true,
+          element: <SearchPageWeek5 />,
+        },
+        {
+          path: 'search',
+          element: <SearchPageWeek5 />
+        },
+        {
+          path: 'watchlist',
+          element: <WatchListPageWeek5 />
+        },
+        {
+          path: 'favorite',
+          element: <FavoritePageWeek5 />
+        },
+      ],
     },
     {
       path: "/week6",
