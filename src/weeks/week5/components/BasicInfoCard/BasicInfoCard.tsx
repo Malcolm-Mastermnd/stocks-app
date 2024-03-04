@@ -9,8 +9,8 @@ import useAxios from "axios-hooks";
 import { NewsResponse, TickerSnapshotResponse } from "../../types/polygon.types";
 import { calculatePercentChange, formatMoney } from "../../utils/utils";
 import FlexXBox from "../common/FlexXBox";
-import { useState } from "react";
 import { Currency } from "../../types/types";
+import { useToggle } from "../../hooks/useToggle";
 
 interface BasicInfoCardProps {
 	stockSymbol: string;
@@ -27,15 +27,8 @@ function BasicInfoCard({
 	isFavorite: initialIsFavorite = false,
 	currency,
 }: BasicInfoCardProps) {
-	const [isOnWatchList, setIsOnWatchList] = useState<boolean>(initialIsOnWatchList);
-	const [isFavorite, setIsFavorite] = useState<boolean>(initialIsFavorite);
-
-	const handleWatchListClick = () => {
-		setIsOnWatchList((prev) => !prev);
-	}
-	const handleFavoriteClick = () => {
-		setIsFavorite((prev) => !prev);
-	}
+	const [isOnWatchList, handleWatchListClick] = useToggle(initialIsOnWatchList);
+	const [isFavorite, handleFavoriteClick] = useToggle(initialIsFavorite);
 
   const [{
       data: snapshotData,

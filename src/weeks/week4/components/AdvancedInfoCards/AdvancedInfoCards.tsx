@@ -103,7 +103,6 @@ function AdvancedInfoCards({
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      console.log('Refetching data')
       refetchWeekBarData();
       refetchMonthBarData();
       refetchYearBarData();
