@@ -17,6 +17,9 @@ import WatchListPageWeek4 from './weeks/week4/pages/WatchListPage/WatchListPage.
 import SearchPageWeek5 from './weeks/week5/pages/SearchPage/SearchPage.tsx';
 import FavoritePageWeek5 from './weeks/week5/pages/FavoritePage/FavoritePage.tsx';
 import WatchListPageWeek5 from './weeks/week5/pages/WatchListPage/WatchListPage.tsx';
+import SearchPageWeek6 from './weeks/week6/pages/SearchPage/SearchPage.tsx';
+import FavoritePageWeek6 from './weeks/week6/pages/FavoritePage/FavoritePage.tsx';
+import WatchListPageWeek6 from './weeks/week6/pages/WatchListPage/WatchListPage.tsx';
 
 const router = createBrowserRouter(
   [
@@ -87,6 +90,24 @@ const router = createBrowserRouter(
     {
       path: "/week6",
       element:  <Week6 />,
+      children: [
+        {
+          index: true,
+          element: <SearchPageWeek6 />,
+        },
+        {
+          path: 'search',
+          element: <SearchPageWeek6 />
+        },
+        {
+          path: 'watchlist',
+          element: <WatchListPageWeek6 />
+        },
+        {
+          path: 'favorite',
+          element: <FavoritePageWeek6 />
+        },
+      ],
     },
     {
       path: "/week7",
