@@ -9,33 +9,53 @@ import useAxios from "axios-hooks";
 import { NewsResponse, TickerSnapshotResponse } from "../../types/polygon.types";
 import { calculatePercentChange, formatMoney } from "../../utils/utils";
 import FlexXBox from "../common/FlexXBox";
-import { Currency } from "../../types/types";
-import { useToggle } from "../../hooks/useToggle";
+import { useContext } from "react";
+import { UserPreferencesContext } from "../../context/react-context/UserPreferences";
+import { useFavoriteStore } from "../../context/zustand/useFavoriteStore";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../context/redux/globalStore";
+import { addToWatchList, removeFromWatchList } from "../../context/redux/useWatchListStore";
+import { Stonk } from "../../types/types";
 
 interface BasicInfoCardProps {
-	stockSymbol: string;
-	companyName: string;
-	isOnWatchList?: boolean;
-	isFavorite?: boolean;
-	currency: Currency;
+	stock: Stonk;
 }
 
 function BasicInfoCard({
-	stockSymbol,
-	companyName,
-	isOnWatchList: initialIsOnWatchList = false,
-	isFavorite: initialIsFavorite = false,
-	currency,
+	stock,
 }: BasicInfoCardProps) {
-	const [isOnWatchList, handleWatchListClick] = useToggle(initialIsOnWatchList);
-	const [isFavorite, handleFavoriteClick] = useToggle(initialIsFavorite);
+	// Context managed by react
+	const { currency } = useContext(UserPreferencesContext);
+
+	// Favorite global state managed by zustand
+	const { favorite, setFavorite } = useFavoriteStore();
+	const isFavorite = favorite?.symbol === stock.symbol;
+	const handleFavoriteClick = () => {
+		if (isFavorite) {
+			setFavorite(undefined);
+		} else {
+			setFavorite(stock)
+		}
+	}
+
+	// Watchlist global state managed by redux
+	const dispatch = useDispatch();
+  const watchList = useSelector((state: RootState) => state.watchList.value);
+	const isOnWatchList = !!watchList.find((watchListStock) => watchListStock.symbol === stock.symbol);
+	const handleWatchListClick = () => {
+		if (isOnWatchList) {
+			dispatch(removeFromWatchList(stock))
+		} else {
+			dispatch(addToWatchList(stock))
+		}
+	}
 
   const [{
       data: snapshotData,
       loading: isSnapshotLoading,
       error: snapshotError,
   }] = useAxios<TickerSnapshotResponse>({
-    url: `${import.meta.env.VITE_POLYGON_API_BASE_URL}/v2/snapshot/locale/us/markets/stocks/tickers/${stockSymbol}`,
+    url: `${import.meta.env.VITE_POLYGON_API_BASE_URL}/v2/snapshot/locale/us/markets/stocks/tickers/${stock.symbol}`,
     params: {
       apiKey: import.meta.env.VITE_POLYGON_API_KEY,
     }
@@ -49,7 +69,7 @@ function BasicInfoCard({
     url: `${import.meta.env.VITE_POLYGON_API_BASE_URL}/v2/reference/news`,
     params: {
       apiKey: import.meta.env.VITE_POLYGON_API_KEY,
-      ticker: stockSymbol,
+      ticker: stock.symbol,
 			limit: 1,
     }
   });
@@ -63,9 +83,9 @@ function BasicInfoCard({
 				{/* Header */}
 				<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
 					<Box sx={{ display: 'flex', flexDirection: 'row' }}>
-						<Typography variant='h4'>{stockSymbol}</Typography>
+						<Typography variant='h4'>{stock.symbol}</Typography>
 						<Divider orientation='vertical' sx={{ backgroundColor: 'white', mx: 2 }} />
-						<Typography variant='h4'>{companyName}</Typography>
+						<Typography variant='h4'>{stock.companyName}</Typography>
 					</Box>
 					<Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
 						<IconButton onClick={handleWatchListClick}>
@@ -88,22 +108,34 @@ function BasicInfoCard({
 					{snapshotData && newsData && !isLoading && !isError && (
 						<>
 							{/* Percentage change */}
-							<PercentaceChange percentage={calculatePercentChange(snapshotData.ticker?.day?.o, snapshotData.ticker?.day?.c)} />
+							<Box width='33%'>
+								<PercentaceChange percentage={calculatePercentChange(snapshotData.ticker?.day?.o, snapshotData.ticker?.day?.c)} />
+							</Box>
 						
 							{/* Prices */}
-							<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+							<FlexYBox alignItems='center' width='34%'>
 								<Typography variant='h5'>{formatMoney(snapshotData.ticker?.day?.c, currency)}</Typography>
 								<Typography variant='subtitle1'>
 									{`High ${formatMoney(snapshotData.ticker?.day?.h, currency)}
 										Low: $${formatMoney(snapshotData.ticker?.day?.l, currency)}`}
 								</Typography>
-							</Box>
+							</FlexYBox>
 							
 							{/* News */}
-							<Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', maxWidth: '20%' }}>
+							<FlexYBox alignItems='center' width='33%' maxHeight='150px'>
 								<Typography variant='h5'>News</Typography>
-								<Typography variant='subtitle1'>{newsData.results[0]?.description}</Typography>
-							</Box>
+								<Typography 
+									sx={{
+										display: '-webkit-box',
+										WebkitLineClamp: 4,
+										WebkitBoxOrient: 'vertical',  
+										overflow: 'hidden',
+										textOverflow: 'ellipsis',
+									}}
+								>
+									{newsData.results[0]?.description}
+								</Typography>
+							</FlexYBox>
 						</>
 					)}
 				</FlexXBox>

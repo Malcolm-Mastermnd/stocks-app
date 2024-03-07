@@ -4,8 +4,9 @@ import PercentaceChange from '../common/PercentageChange';
 import { calculatePercentChange as calcPercentChange, formatMoney } from '../../utils/utils';
 import useAxios from 'axios-hooks';
 import { AggregatesResponse, StockFinancialsResponse, TickerDetailsResponse } from '../../types/polygon.types';
-import { Currency } from '../../types/types';
-import { useEffect } from 'react';
+import { useContext, useEffect } from 'react';
+import { UserPreferencesContext } from '../../context/react-context/UserPreferences';
+import { Stonk } from '../../types/types';
 
 const FIVE_MINUTES = 5 * 60 * 1000;
 
@@ -16,14 +17,14 @@ const TODAY_EST = date.toISOString().split('T')[0];
 const LAST_YEAR_EST = new Date(date.setFullYear(date.getFullYear() - 1)).toISOString().split('T')[0];
 
 interface AdvancedInfoCardsProps {
-  stockSymbol: string;
-	currency: Currency;
+  stock: Stonk;
 }
 
 function AdvancedInfoCards({
-  stockSymbol,
-  currency,
+  stock,
 }: AdvancedInfoCardsProps) {
+  const { currency } = useContext(UserPreferencesContext);
+
   const [
     {
     data: weekBarData,
@@ -32,7 +33,7 @@ function AdvancedInfoCards({
     },
     refetchWeekBarData,
   ] = useAxios<AggregatesResponse>({
-  url: `${import.meta.env.VITE_POLYGON_API_BASE_URL}/v2/aggs/ticker/${stockSymbol}/range/1/week/${LAST_YEAR_EST}/${TODAY_EST}`,
+  url: `${import.meta.env.VITE_POLYGON_API_BASE_URL}/v2/aggs/ticker/${stock.symbol}/range/1/week/${LAST_YEAR_EST}/${TODAY_EST}`,
   params: {
     apiKey: import.meta.env.VITE_POLYGON_API_KEY,
     adjusted: true,
@@ -48,7 +49,7 @@ function AdvancedInfoCards({
     },
     refetchMonthBarData,
   ] = useAxios<AggregatesResponse>({
-  url: `${import.meta.env.VITE_POLYGON_API_BASE_URL}/v2/aggs/ticker/${stockSymbol}/range/1/month/${LAST_YEAR_EST}/${TODAY_EST}`,
+  url: `${import.meta.env.VITE_POLYGON_API_BASE_URL}/v2/aggs/ticker/${stock.symbol}/range/1/month/${LAST_YEAR_EST}/${TODAY_EST}`,
   params: {
     apiKey: import.meta.env.VITE_POLYGON_API_KEY,
     adjusted: true,
@@ -64,7 +65,7 @@ function AdvancedInfoCards({
     },
     refetchYearBarData,
   ] = useAxios<AggregatesResponse>({
-  url: `${import.meta.env.VITE_POLYGON_API_BASE_URL}/v2/aggs/ticker/${stockSymbol}/range/1/year/${LAST_YEAR_EST}/${TODAY_EST}`,
+  url: `${import.meta.env.VITE_POLYGON_API_BASE_URL}/v2/aggs/ticker/${stock.symbol}/range/1/year/${LAST_YEAR_EST}/${TODAY_EST}`,
   params: {
     apiKey: import.meta.env.VITE_POLYGON_API_KEY,
     adjusted: true,
@@ -80,7 +81,7 @@ function AdvancedInfoCards({
     },
     refetchTickerDetailsData,
   ] = useAxios<TickerDetailsResponse>({
-    url: `${import.meta.env.VITE_POLYGON_API_BASE_URL}/v3/reference/tickers/${stockSymbol}`,
+    url: `${import.meta.env.VITE_POLYGON_API_BASE_URL}/v3/reference/tickers/${stock.symbol}`,
     params: {
       apiKey: import.meta.env.VITE_POLYGON_API_KEY,
     }
@@ -97,7 +98,7 @@ function AdvancedInfoCards({
     url: `${import.meta.env.VITE_POLYGON_API_BASE_URL}/vX/reference/financials`,
     params: {
       apiKey: import.meta.env.VITE_POLYGON_API_KEY,
-      ticker: stockSymbol,
+      ticker: stock.symbol,
     }
   });
 
