@@ -1,9 +1,9 @@
 import { create } from 'zustand'
-import { Stonk } from '../../types/types';
+import { SymbolInfo } from '../../types/polygon.types';
 
 interface FavoriteState {
-  favorite?: Stonk;
-  setFavorite: (newFavorite?: Stonk) => void;
+  favorite?: SymbolInfo;
+  setFavorite: (newFavorite?: SymbolInfo) => void;
 }
 
 export const useFavoriteStore = create<FavoriteState>()((set) => ({

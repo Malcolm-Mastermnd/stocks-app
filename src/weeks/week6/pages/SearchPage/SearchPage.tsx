@@ -1,14 +1,18 @@
+import { useState } from 'react';
 import SearchBox from '../../components/SearchBox/SearchBox';
 import StockInformation from '../../components/StockInformation/StockInformation';
 import FlexYBox from '../../components/common/FlexYBox';
+import { SymbolInfo } from '../../types/polygon.types';
 
 function SearchPage() {
+  const [selectedStock, setSelectedStock] = useState<SymbolInfo>();
+
   return (
-    <FlexYBox>
-      <SearchBox order={4} excited={false} />
-      <StockInformation stock={{ symbol: 'AAPL', companyName: 'Apple Inc.' }} />
-      <StockInformation stock={{ symbol: 'TSLA', companyName: 'Tesla Inc.' }} />
-      <StockInformation stock={{ symbol: 'LULU', companyName: 'Lululemon Athletica Inc.' }} />
+    <FlexYBox gap={3}>
+      <SearchBox onStockSelect={setSelectedStock} />
+      {selectedStock && (
+        <StockInformation stock={selectedStock} initialShowAdvancedInfo={true} />
+      )}
     </FlexYBox>
   );
 }

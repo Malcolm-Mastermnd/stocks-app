@@ -1,8 +1,8 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { Stonk } from '../../types/types';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { SymbolInfo } from '../../types/polygon.types';
 
 interface WatchListState {
-  value: Stonk[];
+  value: SymbolInfo[];
 }
 
 const initialState: WatchListState = {
@@ -13,13 +13,13 @@ export const watchListSlice = createSlice({
   name: 'watchList',
   initialState,
   reducers: {
-    addToWatchList: (state, action: PayloadAction<Stonk>) => {
+    addToWatchList: (state, action: PayloadAction<SymbolInfo>) => {
       if (!state.value.includes(action.payload)) {
         state.value = [...state.value, action.payload];
       }
     },
-    removeFromWatchList: (state, action: PayloadAction<Stonk>) => {
-      state.value = state.value.filter((stonk) => stonk.symbol !== action.payload.symbol);
+    removeFromWatchList: (state, action: PayloadAction<SymbolInfo>) => {
+      state.value = state.value.filter((stonk) => stonk.ticker !== action.payload.ticker);
     }
   }
 })

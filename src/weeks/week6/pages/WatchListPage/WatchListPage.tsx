@@ -19,7 +19,11 @@ function WatchListPage() {
       {watchList.length ? (
         <FlexYBox gap={4}>
           {watchList.map((stonk) => (
-            <StockInformation key={stonk.symbol} stock={stonk} />
+            <StockInformation
+              key={stonk.ticker}
+              stock={stonk}
+              initialShowAdvancedInfo={false}
+            />
           ))}
         </FlexYBox>
       ): (

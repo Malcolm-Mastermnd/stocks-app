@@ -1,19 +1,30 @@
 import BasicInfoCard from '../BasicInfoCard/BasicInfoCard';
 import AdvancedInfoCards from '../AdvancedInfoCards/AdvancedInfoCards';
 import FlexYBox from '../common/FlexYBox';
-import { Stonk } from '../../types/types';
+import { SymbolInfo } from '../../types/polygon.types';
+import { useToggle } from '../../hooks/useToggle';
 
 interface StockInformationProps {
-  stock: Stonk;
+  stock: SymbolInfo;
+  initialShowAdvancedInfo: boolean;
 }
 
 function StockInformation({
   stock,
+  initialShowAdvancedInfo,
 }: StockInformationProps) {
+  const [showAdvancedInfo, toggleShowAdvancedInfo] = useToggle(initialShowAdvancedInfo);
+
   return (
     <FlexYBox width='100%' gap={2}>
-      <BasicInfoCard stock={stock} />
-      <AdvancedInfoCards stock={stock} />
+      <BasicInfoCard
+        stock={stock}
+        isShowingAdvancedInfo={showAdvancedInfo}
+        onToggleClick={toggleShowAdvancedInfo}
+      />
+      {showAdvancedInfo && (
+        <AdvancedInfoCards stock={stock} />
+      )}
     </FlexYBox>
   );
 }

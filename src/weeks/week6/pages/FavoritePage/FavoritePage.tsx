@@ -15,7 +15,7 @@ function FavoritePage() {
       </FlexXBox>
 
       {favorite ? (
-        <StockInformation stock={favorite} />
+        <StockInformation stock={favorite} initialShowAdvancedInfo={true} />
       ) : (
         <FlexYBox flexGrow={1} justifyContent='center' alignItems='center'>
           <Typography>You do not currently have a favorite stock.</Typography>

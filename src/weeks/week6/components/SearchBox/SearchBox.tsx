@@ -1,41 +1,90 @@
-import React from 'react';
-
-type SearchBoxStyles = {
-  root: React.CSSProperties,
-}
-
-const divWithBorder: React.CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  width: '100%',
-  justifyContent: 'center',
-  alignItems: 'center',
-  border: '3px solid green',
-}
-
-const styles: SearchBoxStyles = {
-  root: {
-    ...divWithBorder,
-    height: '100px',
-    marginBottom: '8px',
-  },
-}
+import {
+  Autocomplete,
+  CircularProgress,
+  ListItem,
+  ListItemText,
+  TextField,
+  debounce,
+} from '@mui/material';
+import useAxios from 'axios-hooks';
+import React, { useEffect, useMemo } from 'react';
+import { SymbolInfo, SymbolSearchResponse } from '../../types/polygon.types';
+import SearchIcon from '@mui/icons-material/Search';
+import FlexXBox from '../common/FlexXBox';
+import WatchlistToggleButton from '../common/WatchlistToggleButton';
+import FavoriteToggleButton from '../common/FavoriteToggleButton';
 
 interface SearchBoxProps {
-  order: number;
-  excited: boolean;
+  onStockSelect: (stock?: SymbolInfo) => void;
 }
 
 function SearchBox({
-  order,
-  excited,
+  onStockSelect,
 }: SearchBoxProps) {
+  const [searchQuery, setSearchQuery] = React.useState('');
+
+  const [{ data, loading, error }, refetch] = useAxios<SymbolSearchResponse>(
+    {
+      url: `${import.meta.env.VITE_POLYGON_API_BASE_URL}/v3/reference/tickers`,
+      params: {
+        apiKey: import.meta.env.VITE_POLYGON_API_KEY,
+        search: searchQuery,
+        market: 'stocks',
+      }
+    },
+    {
+      manual: true,
+    }
+  );
+
+  const debouncedRefetch = useMemo(() => debounce(() => {
+    if (searchQuery && searchQuery.length > 2) {
+      refetch();
+    }
+  }, 500), [searchQuery, refetch]);
+  
+  useEffect(() => {
+    debouncedRefetch();
+  }, [searchQuery, debouncedRefetch]);
+
   return (
-    <div style={styles.root}>
-      <div>Search Bar</div>
-      <div>{`Order that this will be worked on: ${order}`}</div>
-      <div>{`I am${excited ? '' : ' not'} excited to work on this part`}</div>
-    </div>
+    <Autocomplete<SymbolInfo>
+      id='stock-search'
+      isOptionEqualToValue={(stock, value) => stock.ticker === value.ticker}
+      getOptionLabel={(stock) => stock.ticker}
+      options={data?.results || []}
+      loading={loading}
+      onInputChange={(_, value) => { setSearchQuery(value) }}
+      onChange={(_, stock) => { onStockSelect(stock || undefined) }}
+      filterOptions={(options) => options}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          label='Search for a stock...'
+          helperText={error ? 'Error fetching cities' : ''}
+          InputProps={{
+            ...params.InputProps,
+            endAdornment: (
+              <React.Fragment>
+                {loading ? <CircularProgress color='inherit' size={20} /> : null}
+                <SearchIcon />
+              </React.Fragment>
+            ),
+          }}
+        />
+      )}
+      renderOption={(props, stock) => (
+        <ListItem key={stock.ticker} {...props}>
+          <ListItemText primary={stock.ticker} secondary={stock.name} />
+          <FlexXBox flexGrow={1} />
+          <FlexXBox>
+            <WatchlistToggleButton stock={stock} />
+            <FavoriteToggleButton stock={stock} />
+          </FlexXBox>
+
+        </ListItem>
+      )}
+    />
   );
 }
 

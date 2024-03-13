@@ -1,61 +1,36 @@
-import { Box, Card, CircularProgress, Divider, IconButton, Typography } from "@mui/material";
-import EyeIcon from '@mui/icons-material/Visibility';
-import EyeOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
-import StarIcon from '@mui/icons-material/Star';
-import StarBorderIcon from '@mui/icons-material/StarBorder';
+import { Box, Card, CardActions, CircularProgress, Divider, IconButton, Typography } from "@mui/material";
 import FlexYBox from "../common/FlexYBox";
 import PercentaceChange from "../common/PercentageChange";
 import useAxios from "axios-hooks";
-import { NewsResponse, TickerSnapshotResponse } from "../../types/polygon.types";
+import { NewsResponse, SymbolInfo, TickerSnapshotResponse } from "../../types/polygon.types";
 import { calculatePercentChange, formatMoney } from "../../utils/utils";
 import FlexXBox from "../common/FlexXBox";
 import { useContext } from "react";
 import { UserPreferencesContext } from "../../context/react-context/UserPreferences";
-import { useFavoriteStore } from "../../context/zustand/useFavoriteStore";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../context/redux/globalStore";
-import { addToWatchList, removeFromWatchList } from "../../context/redux/useWatchListStore";
-import { Stonk } from "../../types/types";
+import WatchlistToggleButton from "../common/WatchlistToggleButton";
+import FavoriteToggleButton from "../common/FavoriteToggleButton";
+import { KeyboardArrowDown, KeyboardArrowUp } from "@mui/icons-material";
 
 interface BasicInfoCardProps {
-	stock: Stonk;
+	stock: SymbolInfo;
+	isShowingAdvancedInfo: boolean;
+	onToggleClick: () => void;
 }
 
 function BasicInfoCard({
 	stock,
+	isShowingAdvancedInfo,
+	onToggleClick,
 }: BasicInfoCardProps) {
 	// Context managed by react
 	const { currency } = useContext(UserPreferencesContext);
-
-	// Favorite global state managed by zustand
-	const { favorite, setFavorite } = useFavoriteStore();
-	const isFavorite = favorite?.symbol === stock.symbol;
-	const handleFavoriteClick = () => {
-		if (isFavorite) {
-			setFavorite(undefined);
-		} else {
-			setFavorite(stock)
-		}
-	}
-
-	// Watchlist global state managed by redux
-	const dispatch = useDispatch();
-  const watchList = useSelector((state: RootState) => state.watchList.value);
-	const isOnWatchList = !!watchList.find((watchListStock) => watchListStock.symbol === stock.symbol);
-	const handleWatchListClick = () => {
-		if (isOnWatchList) {
-			dispatch(removeFromWatchList(stock))
-		} else {
-			dispatch(addToWatchList(stock))
-		}
-	}
 
   const [{
       data: snapshotData,
       loading: isSnapshotLoading,
       error: snapshotError,
   }] = useAxios<TickerSnapshotResponse>({
-    url: `${import.meta.env.VITE_POLYGON_API_BASE_URL}/v2/snapshot/locale/us/markets/stocks/tickers/${stock.symbol}`,
+    url: `${import.meta.env.VITE_POLYGON_API_BASE_URL}/v2/snapshot/locale/us/markets/stocks/tickers/${stock.ticker}`,
     params: {
       apiKey: import.meta.env.VITE_POLYGON_API_KEY,
     }
@@ -69,7 +44,7 @@ function BasicInfoCard({
     url: `${import.meta.env.VITE_POLYGON_API_BASE_URL}/v2/reference/news`,
     params: {
       apiKey: import.meta.env.VITE_POLYGON_API_KEY,
-      ticker: stock.symbol,
+      ticker: stock.ticker,
 			limit: 1,
     }
   });
@@ -83,17 +58,13 @@ function BasicInfoCard({
 				{/* Header */}
 				<Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
 					<Box sx={{ display: 'flex', flexDirection: 'row' }}>
-						<Typography variant='h4'>{stock.symbol}</Typography>
+						<Typography variant='h4'>{stock.ticker}</Typography>
 						<Divider orientation='vertical' sx={{ backgroundColor: 'white', mx: 2 }} />
-						<Typography variant='h4'>{stock.companyName}</Typography>
+						<Typography variant='h4'>{stock.name}</Typography>
 					</Box>
 					<Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
-						<IconButton onClick={handleWatchListClick}>
-							{isOnWatchList ? <EyeIcon fontSize='large' /> : <EyeOutlinedIcon fontSize='large' />}
-						</IconButton>
-						<IconButton onClick={handleFavoriteClick}>
-							{isFavorite ? <StarIcon fontSize='large' /> : <StarBorderIcon fontSize='large' />}
-						</IconButton>
+						<WatchlistToggleButton stock={stock} />
+						<FavoriteToggleButton stock={stock} />
 					</Box>
 				</Box>
 
@@ -140,6 +111,11 @@ function BasicInfoCard({
 					)}
 				</FlexXBox>
 			</FlexYBox>
+			<CardActions sx={{ justifyContent: 'flex-end' }}>
+				<IconButton onClick={onToggleClick}>
+					{isShowingAdvancedInfo ? <KeyboardArrowDown /> : <KeyboardArrowUp />}
+				</IconButton>
+			</CardActions>
 		</Card>
 	)
 }
